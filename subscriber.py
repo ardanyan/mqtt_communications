@@ -2,12 +2,12 @@ import paho.mqtt.client as mqtt
 import json
 from datetime import datetime
 
-HOST = "192.168.43.114" # Host Raspberry IP Address
+HOST = "93ac6c9412324249b4ef263401803a6e.s1.eu.hivemq.cloud" # Host Raspberry IP Address
 TOPIC = "sensor_data"
 FORMAT = "utf-8"
 
 
-def logger_callback(msg:str) -> None:
+def logger_callback(msg) -> None:
     print("[SUBSCRIBER] {} - {}".format(
         datetime.now().strftime("%y/%m/%d %H:%M:%S.%f"), msg))
 

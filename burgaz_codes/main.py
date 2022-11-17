@@ -29,6 +29,9 @@ SLEEP_TIMEOUT = 1 # in seconds
 def get_timestamp() -> str:
     return datetime.now(timezone("UTC")).strftime("%y/%m/%d %H:%M:%S.%f %Z%z")
 
+def get_file_name() -> str:
+    return datetime.now(timezone("UTC")).strftime("%y-%m-%d") + ".txt"
+
 def logger_callback(msg:str) -> None:
     print("[PUBLISHER] {} - {}".format(
         get_timestamp(), msg))
@@ -83,16 +86,22 @@ class Publisher:
         
     def record_locally(self) -> None:
         while True:
-            data_as_dict = self.__read()
-            if data_as_dict is not None:
-                with open("data.txt", "a") as file:
-                    json.dump(data_as_dict, file)
-                    file.write("\n")
-                    self.__logger("Written into local file")
+            try:
+                data_as_dict = self.__read()
+                if data_as_dict is not None:
+                    with open(get_file_name(), "a+") as file:
+                        json.dump(data_as_dict, file)
+                        file.write("\n")
+                        self.__logger("Written into local file")
                 time.sleep(SLEEP_TIMEOUT)
+            except UnicodeDecodeError:
+                self.__serial.close()
+                time.sleep(SLEEP_TIMEOUT)
+                self.__serial = Serial(SERIAL_PORT, BAUDRATE, timeout=SERIAL_TIMEOUT)
         
 
 if __name__ == "__main__":
+    time.sleep(3)
     publisher_client = Publisher("SWAIN_Publisher")
     """publisher_client.start() # Default parameters
     while True:
